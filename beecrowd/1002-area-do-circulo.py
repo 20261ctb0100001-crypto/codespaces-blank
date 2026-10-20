@@ -1,7 +1,7 @@
 '''
 Problema: beecrowd | 1002
-Data: ???
-Estudante: ???
+Data: 06.10.2026
+Estudante: rafael glinski de oliveira
 '''
 
 # Objetivo: Ler o raio de um círculo e calcular sua área
