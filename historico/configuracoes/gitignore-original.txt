@@ -1,0 +1,12 @@
+# Arquivos temporários do Python
+__pycache__/
+*.py[cod]
+
+# Executáveis compilados
+fliperama-c/fliperama
+fliperama-c/fliperama.exe
+TI/projetos-antigos/fliperama-python/fliperama
+TI/projetos-antigos/fliperama-python/jogo
+
+# Arquivos locais de configuração
+.vscode/

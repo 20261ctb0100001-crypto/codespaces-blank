@@ -1,0 +1,67 @@
+name: Testar Fliperama em C
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "fliperama.c/**"
+      - ".github/workflows/testar-fliperama.yml"
+  pull_request:
+    paths:
+      - "fliperama.c/**"
+      - ".github/workflows/testar-fliperama.yml"
+
+jobs:
+  compilar-e-testar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Compilar sem avisos
+        working-directory: fliperama.c
+        run: gcc -Wall -Wextra -Werror -std=c99 fliperama.c -o fliperama
+
+      - name: Testar cadastro e persistencia
+        shell: bash
+        run: |
+          mkdir -p /tmp/fliperama-teste
+          cp fliperama.c/fliperama /tmp/fliperama-teste/
+          cp fliperama.c/jogadores.csv /tmp/fliperama-teste/
+          cd /tmp/fliperama-teste
+          printf '2\\nci_teste\\n3\\n0\\n' | ./fliperama > primeira_execucao.txt
+          grep -q 'Jogador cadastrado com sucesso' primeira_execucao.txt
+          grep -q '^ci_teste,0$' jogadores.csv
+          printf '3\\n0\\n' | ./fliperama > segunda_execucao.txt
+          grep -q 'ci_teste' segunda_execucao.txt
+
+      - name: Testar validacao e Par ou Impar
+        shell: bash
+        run: |
+          cd /tmp/fliperama-teste
+          printf 'letra_invalida\\n9\\nci_teste\\n1\\n5\\n0\\n' | ./fliperama > validacao_jogo.txt
+          grep -q 'Digite uma opcao valida' validacao_jogo.txt
+          grep -q 'Soma:' validacao_jogo.txt
+
+      - name: Testar edicao, exclusao e saida do Adivinhe
+        shell: bash
+        run: |
+          cd /tmp/fliperama-teste
+          printf '8\\n4\\nci_editado\\n3\\n0\\n' | ./fliperama > edicao.txt
+          grep -q 'Apelido atualizado com sucesso' edicao.txt
+          grep -q 'ci_editado' jogadores.csv
+          printf '4\\n4\\n1\\n3\\n0\\n' | ./fliperama > exclusao.txt
+          grep -q 'Jogador excluido com sucesso' exclusao.txt
+          if grep -q 'ci_editado' jogadores.csv; then exit 1; fi
+          printf '1\\nrafael\\n0\\n-1\\n0\\n' | ./fliperama > adivinhe.txt
+          grep -q 'Digite um numero de 1 a 100 ou -1 para sair' adivinhe.txt
+          grep -q 'Voce saiu do Adivinhe o Numero' adivinhe.txt
+
+      - name: Testar limite maximo de jogadores
+        shell: bash
+        run: |
+          cd /tmp/fliperama-teste
+          for i in $(seq 1 50); do printf 'jogador%02d,0\\n' "$i"; done > jogadores.csv
+          printf '2\\nnao_deve_entrar\\n0\\n' | ./fliperama > capacidade.txt
+          grep -q 'Limite de jogadores atingido' capacidade.txt
+          if grep -q 'nao_deve_entrar' jogadores.csv; then exit 1; fi

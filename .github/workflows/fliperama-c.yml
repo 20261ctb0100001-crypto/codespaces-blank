@@ -1,0 +1,26 @@
+name: Validar Fliperama em C
+
+on:
+  push:
+    paths:
+      - "fliperama-c/**"
+      - ".github/workflows/fliperama-c.yml"
+  pull_request:
+    paths:
+      - "fliperama-c/**"
+      - ".github/workflows/fliperama-c.yml"
+
+jobs:
+  compilar-e-testar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Compilar com avisos
+        working-directory: fliperama-c
+        run: gcc -std=c99 -Wall -Wextra -pedantic -Werror fliperama.c -o fliperama
+
+      - name: Teste basico de inicializacao e saida
+        working-directory: fliperama-c
+        run: printf "0\n" | ./fliperama
