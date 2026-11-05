@@ -19,7 +19,7 @@ int main() {
             vencedor = 2;
     }
 
-    cout << "Jogador " << vencedor << " ganha!" << endl;
+    cout << "Jogador " << vencedor << " ganha." << endl;
 
     return 0;
 }
