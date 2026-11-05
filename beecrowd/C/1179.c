@@ -2,7 +2,7 @@
 
 int main(void) {
     int par[5], impar[5];
-    int valor, i, qtdPar = 0, qtdImpar = 0;
+    int valor, i, j, qtdPar = 0, qtdImpar = 0;
 
     for (i = 0; i < 15; i++) {
         scanf("%d", &valor);
@@ -12,8 +12,8 @@ int main(void) {
             qtdPar++;
 
             if (qtdPar == 5) {
-                for (int j = 0; j < 5; j++)
-                    printf("par[%d] = %d\\n", j, par[j]);
+                for (j = 0; j < 5; j++)
+                    printf("par[%d] = %d\n", j, par[j]);
                 qtdPar = 0;
             }
         } else {
@@ -21,18 +21,18 @@ int main(void) {
             qtdImpar++;
 
             if (qtdImpar == 5) {
-                for (int j = 0; j < 5; j++)
-                    printf("impar[%d] = %d\\n", j, impar[j]);
+                for (j = 0; j < 5; j++)
+                    printf("impar[%d] = %d\n", j, impar[j]);
                 qtdImpar = 0;
             }
         }
     }
 
     for (i = 0; i < qtdImpar; i++)
-        printf("impar[%d] = %d\\n", i, impar[i]);
+        printf("impar[%d] = %d\n", i, impar[i]);
 
     for (i = 0; i < qtdPar; i++)
-        printf("par[%d] = %d\\n", i, par[i]);
+        printf("par[%d] = %d\n", i, par[i]);
 
     return 0;
 }
