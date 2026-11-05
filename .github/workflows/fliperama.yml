@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - "fliperama.c/**"
-      - ".github/workflows/fliperama.c.yml"
+      - ".github/workflows/fliperama.yml"
   pull_request:
     paths:
       - "fliperama.c/**"
-      - ".github/workflows/fliperama.c.yml"
+      - ".github/workflows/fliperama.yml"
 
 jobs:
   compilar-e-testar:
