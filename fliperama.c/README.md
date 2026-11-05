@@ -18,7 +18,7 @@ O Fliperama em C é um programa de terminal desenvolvido como continuação do p
 No GitHub Codespaces, abra o terminal e execute:
 
 ```bash
-cd /workspaces/codespaces-blank/fliperama-c
+cd /workspaces/codespaces-blank/fliperama.c
 gcc -std=c99 -Wall -Wextra -pedantic -Werror fliperama.c -o fliperama
 ./fliperama
 ```
