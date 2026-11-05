@@ -15,9 +15,9 @@ int main(void) {
         }
 
         if (primo)
-            printf("%d eh primo\\n", N);
+            printf("%d eh primo\n", N);
         else
-            printf("%d nao eh primo\\n", N);
+            printf("%d nao eh primo\n", N);
     }
 
     return 0;

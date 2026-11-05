@@ -21,9 +21,9 @@ int main(void) {
         }
 
         if (soma == N)
-            printf("%d eh perfeito\\n", N);
+            printf("%d eh perfeito\n", N);
         else
-            printf("%d nao eh perfeito\\n", N);
+            printf("%d nao eh perfeito\n", N);
     }
 
     return 0;
