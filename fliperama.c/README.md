@@ -47,3 +47,7 @@ Também precisei escolher como os dados seriam guardados no arquivo: cada linha 
 ## 6. Autoavaliação
 
 Com este projeto, pratiquei funções, vetores, strings, estruturas de decisão, laços, números aleatórios e leitura e gravação de arquivos. A comparação com Python ajudou a perceber que, em C, preciso controlar explicitamente os limites dos vetores e cuidar da manipulação de memória. Ainda posso melhorar os testes de cada jogo e treinar mais o uso de ponteiros e arquivos.
+
+## 7. Uso de ferramentas de IA
+
+Utilizei o ChatGPT como apoio durante o desenvolvimento do projeto, para esclarecer dúvidas, revisar trechos do código, identificar possíveis problemas e organizar a documentação. As sugestões foram analisadas e aplicadas no projeto, e a versão final foi conferida por meio da compilação e do teste automático.
