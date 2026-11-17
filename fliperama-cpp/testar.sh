@@ -24,6 +24,6 @@ grep -q "Jogador cadastrado com sucesso" resultado.txt
 grep -q "Apelido atualizado com sucesso" resultado.txt
 grep -q "Jogador excluido com sucesso" resultado.txt
 grep -q "Dados salvos" resultado.txt
-grep -q "^rafael,0$" jogadores.csv
+grep -q "^rafael,3$" jogadores.csv
 
 echo "Todos os testes automatizados passaram."
