@@ -320,7 +320,7 @@ void pedraPapelTesoura(Jogador jogadores[], int qtd) {
     cout << "Sua escolha: ";
     escolha = lerNumero(0, 3);
 
-    if (escolha == -1) {
+    if (escolha == -2) {
         cout << "Escolha invalida.\n";
         return;
     }
@@ -581,6 +581,11 @@ int main() {
         opcao = lerNumero(0, 9);
 
         if (opcao == -2) {
+            if (cin.eof()) {
+                salvar(jogadores, qtd);
+                opcao = 0;
+                continue;
+            }
             cout << "Digite uma opcao valida de 0 a 9.\n\n";
             continue;
         }
