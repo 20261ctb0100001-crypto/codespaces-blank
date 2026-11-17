@@ -85,7 +85,7 @@ void carregar(Jogador jogadores[], int &qtd) {
         }
 
         if (nome.empty() || nome.length() >= 20 ||
-            nome.find('\\r') != string::npos || total < 0 ||
+            nome.find('\r') != string::npos || total < 0 ||
             qtd >= CAPACIDADE) {
             continue;
         }
