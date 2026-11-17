@@ -11,7 +11,7 @@ on:
       - ".github/workflows/fliperama-cpp.yml"
 
 jobs:
-  compilar-e-testar:
+  compilar-e-iniciar:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar codigo
@@ -21,6 +21,6 @@ jobs:
         working-directory: fliperama-cpp
         run: g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
 
-      - name: Teste basico de inicializacao e saida
+      - name: Testar inicializacao e saida
         working-directory: fliperama-cpp
-        run: printf "0\\n" | ./fliperama
+        run: echo 0 | ./fliperama
