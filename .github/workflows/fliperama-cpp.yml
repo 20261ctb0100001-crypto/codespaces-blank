@@ -24,3 +24,7 @@ jobs:
       - name: Teste basico de inicializacao e saida
         working-directory: fliperama-cpp
         run: printf "0\n" | ./fliperama
+
+      - name: Executar testes automatizados
+        working-directory: fliperama-cpp
+        run: bash testar.sh
