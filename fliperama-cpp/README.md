@@ -1,80 +1,78 @@
-# Fliperama em C++
+# Fliperama em C++ (MeuApp v4.0)
 
-## 1. Sobre o projeto
+## O que e
 
-Este projeto é a versão em C++ do Fliperama que foi desenvolvido anteriormente em C. Ele funciona pelo terminal e reúne um cadastro de jogadores, cinco jogos contra o computador e um placar simples. Os dados são guardados no arquivo `jogadores.csv`, para continuarem disponíveis quando o programa for aberto novamente.
+Este programa de terminal continua o Fliperama que foi feito antes em C. Ele tem cadastro de jogadores, jogos contra o computador, ranking e salvamento das partidas em um arquivo CSV.
 
-## 2. Funcionalidades
+O ChatGPT foi usado como apoio para adaptar o codigo para C++, revisar o funcionamento e organizar este README. O codigo e as decisoes do projeto precisam ser revisados e compreendidos pelo estudante.
 
-### Cadastro de jogadores
-- Cadastrar jogadores com apelido.
-- Listar os jogadores cadastrados e a quantidade de partidas concluídas.
-- Editar apelidos.
-- Excluir jogadores com confirmação.
-- Limite de 50 jogadores.
-- Não permite apelidos vazios, repetidos, com vírgula ou com 20 caracteres ou mais.
+## Como compilar e rodar
 
-### Jogos
-- **Adivinhe o Número:** descobrir um número aleatório entre 1 e 100.
-- **Cara ou Coroa:** escolher um lado da moeda.
-- **UNO simplificado:** combinar a cor ou o número das cartas; é possível comprar cartas e sair da partida.
-- **Pedra, Papel e Tesoura:** jogar contra o computador.
-- **Par ou Ímpar:** escolher par ou ímpar e um número de 0 a 10.
-
-Nos jogos que oferecem a opção, digite o número indicado para voltar ao menu. No Adivinhe o Número e no UNO, digite `-1` para sair da partida.
-
-## 3. Organização dos arquivos
-
-```text
-fliperama-cpp/
-├── fliperama.cpp   # Código-fonte do programa
-├── jogadores.csv  # Dados iniciais dos jogadores
-└── README.md      # Documentação
-```
-
-O programa principal fica em um único arquivo `.cpp` para manter a implementação simples e fácil de compilar.
-
-## 4. Como compilar e executar
-
-No terminal do GitHub Codespaces, execute:
+Dentro da pasta `fliperama-cpp`, execute:
 
 ```bash
-cd /workspaces/codespaces-blank/fliperama-cpp
 g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
 ./fliperama
 ```
 
-O comando de compilação cria o executável local `fliperama`. Esse arquivo não deve ser enviado ao GitHub; o `.gitignore` já está configurado para ignorá-lo.
+O executavel `fliperama` e criado somente no ambiente local e nao deve ser enviado ao GitHub.
 
-## 5. Arquivo de jogadores
+## Arquivos
 
-Cada linha de `jogadores.csv` segue este formato:
+- `fliperama.cpp`: menu, cadastro, jogos, ranking e funcoes para salvar e carregar os dados.
+- `jogadores.csv`: apelido e quantidade de partidas de cada jogador, separados por virgula.
+- `README.md`: explicacao do projeto, comparacao entre C e C++ e autoavaliacao.
+
+## C x C++: o que mudou
+
+| O que | No fliperama.c (linha) | No fliperama.cpp (linha) |
+|---|---|---|
+| Guardar um jogador | `strcpy(apelidos[*qtd], nome)` (160) | `apelidos.push_back(novo)` (144) |
+| Comparar apelidos | `strcmp(apelidos[i], procurado) == 0` (42) | `apelidos[i] == procurado` (76) |
+| Funcao que cadastra | `void cadastrar(char apelidos[][TAM_APELIDO], ...)` (139) | `void cadastrar(vector<string> &apelidos, ...)` (131) |
+| Ler uma opcao | `fgets` e `strtol` (57) | `cin >> numero` (43) |
+| Salvar e carregar | `fopen` (127) | `ofstream` (85) e `ifstream` (100) |
+| Vetor de apelidos | `char apelidos[CAPACIDADE][TAM_APELIDO]` (638) | `vector<string> apelidos` (511) |
+
+### O que o C++ decidiu por mim
+
+Com `string`, nao preciso copiar apelidos com `strcpy` nem comparar texto com `strcmp`: posso usar atribuicao e `==`.
+
+Com `vector`, a lista pode crescer com `push_back` e diminuir com `erase`, sem definir uma capacidade fixa para o cadastro.
+
+### O que continua comigo
+
+Eu ainda preciso passar os vectors por referencia (`&`) nas funcoes que trabalham com o cadastro, para que as mudancas aparecam no `main`.
+
+Tambem preciso manter `apelidos` e `partidas` na mesma posicao: quando cadastro ou excluo alguem, as duas listas devem mudar juntas. O ranking usa indices para nao separar esses dados nem mudar a ordem original do cadastro.
+
+### Exemplo de execucao
+
+Trecho de uma abertura com tres registros no arquivo:
 
 ```text
-apelido,partidas
+3 jogador(es) carregado(s).
+O programa iniciou com 3 jogador(es) carregado(s).
+========================================
+FLIPERAMA EM C++
+========================================
+Desenvolvido por: Rafael Glinski de Oliveira
+[1] Adivinhe o Numero
+[2] Cadastrar jogador
+[3] Listar jogadores
+...
+[10] Ranking
+[0] Salvar e sair
+========================================
+Sua escolha:
 ```
 
-Exemplo:
+## Autoavaliacao
 
-```text
-rafael,0
-renan,0
-pedro,0
-```
-
-Não coloque vírgulas nos apelidos, porque a vírgula separa os campos do CSV.
-
-## 6. O que foi utilizado de C++
-
-A versão utiliza:
-- `struct` para agrupar os dados de cada jogador e de cada carta.
-- `string` para trabalhar com apelidos.
-- `cin` e `cout` para entrada e saída.
-- `ifstream` e `ofstream` para carregar e salvar o arquivo.
-- Funções, vetores, estruturas condicionais e laços de repetição.
-
-A lógica dos jogos e do cadastro foi adaptada da versão anterior em C para utilizar recursos de C++.
-
-## 7. Uso de ferramentas de IA
-
-O ChatGPT foi utilizado como apoio na adaptação do projeto de C para C++, na revisão da leitura de dados e na organização deste README. O estudante deve revisar o código, executar o programa e compreender as funções antes da apresentação ou entrega.
+| Criterio | Conceito que espero | Onde se prova (arquivo e linha) |
+|---|---|---|
+| 1. Estrutura, compilacao e Git | B | Compilacao: comando acima; `.gitignore` com seis linhas; historico de commits do repositorio. |
+| 2. Cadastro: vectors e referencia | A | `cadastrar` linha 131; recusa de repetido e `push_back` linha 144; `excluir` linha 165; `alterar` linha 193; ranking linha 462. |
+| 3. Jogo e partidas | A | Adivinhe e soma de partidas; segundo jogo com `eh_par()` que devolve `bool`, linha 306. |
+| 4. Persistencia | A | `salvar` linha 84; `carregar` linha 100; mensagem de jogadores carregados no inicio, perto da linha 511. |
+| 5. Documentacao e comparacao | A | Esta tabela tem seis linhas de comparacao; inclui as duas secoes de decisoes e o exemplo de execucao. |
