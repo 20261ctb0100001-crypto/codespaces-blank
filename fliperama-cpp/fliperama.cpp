@@ -1,24 +1,29 @@
 /*
- * Projeto: Fliperama em C++
+ * Disciplina: 2026-PCAP
+ * Projeto: MeuApp v4.0 - Fliperama em C++
  * Autor: Rafael Glinski de Oliveira
+ * LIAC: Menu validado, cadastro em vectors paralelos, jogos que contam
+ * partidas e dados guardados em arquivo CSV.
  */
 
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
+#include <vector>
 #include <cstdlib>
 #include <ctime>
 
+#define DONO "Rafael Glinski de Oliveira"
+#define ARQUIVO "jogadores.csv"
+
 using namespace std;
 
-const int CAPACIDADE = 50;
-const string ARQUIVO = "jogadores.csv";
-
-struct Jogador {
-    string apelido;
-    int partidas;
+struct Carta {
+    int cor;
+    int numero;
 };
+
+string cores[4] = {"Vermelho", "Azul", "Verde", "Amarelo"};
 
 void linha() {
     cout << "========================================\n";
@@ -30,611 +35,528 @@ void titulo(string texto) {
     linha();
 }
 
-int buscar(Jogador jogadores[], int qtd, string nome) {
-    for (int i = 0; i < qtd; i++) {
-        if (jogadores[i].apelido == nome) {
+int ler_numero(string mensagem, int minimo, int maximo) {
+    int numero;
+
+    while (true) {
+        cout << mensagem;
+        cin >> numero;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Digite um numero valido.\n";
+            continue;
+        }
+
+        cin.ignore(1000, '\n');
+
+        if (numero < minimo || numero > maximo) {
+            cout << "Escolha um numero entre " << minimo
+                 << " e " << maximo << ".\n";
+            continue;
+        }
+
+        return numero;
+    }
+}
+
+string ler_texto(string mensagem) {
+    string texto;
+
+    cout << mensagem;
+    cin >> texto;
+    cin.ignore(1000, '\n');
+
+    return texto;
+}
+
+int buscar(const vector<string> &apelidos, string procurado) {
+    for (int i = 0; i < (int)apelidos.size(); i++) {
+        if (apelidos[i] == procurado) {
             return i;
         }
     }
+
     return -1;
 }
 
-int lerNumero(int minimo, int maximo) {
-    string entrada;
-    int numero;
-    char extra;
-    stringstream fluxo;
-
-    if (!getline(cin, entrada)) {
-        return -2;
-    }
-
-    fluxo.str(entrada);
-
-    if (!(fluxo >> numero) || (fluxo >> extra)) {
-        return -2;
-    }
-
-    if (numero < minimo || numero > maximo) {
-        return -2;
-    }
-
-    return numero;
-}
-
-void carregar(Jogador jogadores[], int &qtd) {
-    ifstream arquivo(ARQUIVO.c_str());
-
-    if (!arquivo.is_open()) {
-        cout << "Nenhum arquivo anterior. Comecando com cadastro vazio.\n";
-        return;
-    }
-
-    string linhaArquivo;
-    qtd = 0;
-
-    while (getline(arquivo, linhaArquivo)) {
-        stringstream fluxo(linhaArquivo);
-        string nome;
-        int total;
-        char extra;
-
-        if (!getline(fluxo, nome, ',') || !(fluxo >> total) ||
-            (fluxo >> extra)) {
-            continue;
-        }
-
-        if (nome.empty() || nome.length() >= 20 ||
-            nome.find('\r') != string::npos || total < 0 ||
-            qtd >= CAPACIDADE) {
-            continue;
-        }
-
-        if (buscar(jogadores, qtd, nome) == -1) {
-            jogadores[qtd].apelido = nome;
-            jogadores[qtd].partidas = total;
-            qtd++;
-        }
-    }
-
-    arquivo.close();
-    cout << qtd << " jogador(es) carregado(s).\n";
-}
-
-void salvar(Jogador jogadores[], int qtd) {
-    ofstream arquivo(ARQUIVO.c_str());
+void salvar(vector<string> &apelidos, vector<int> &partidas) {
+    ofstream arquivo(ARQUIVO);
 
     if (!arquivo.is_open()) {
         cout << "Erro ao salvar os jogadores.\n";
         return;
     }
 
-    for (int i = 0; i < qtd; i++) {
-        arquivo << jogadores[i].apelido << ","
-                << jogadores[i].partidas << "\n";
+    for (int i = 0; i < (int)apelidos.size(); i++) {
+        arquivo << apelidos[i] << "," << partidas[i] << "\n";
     }
 
     arquivo.close();
 }
 
-void cadastrar(Jogador jogadores[], int &qtd) {
+int carregar(vector<string> &apelidos, vector<int> &partidas) {
+    ifstream arquivo(ARQUIVO);
     string nome;
+    int total;
+    int carregados = 0;
 
-    if (qtd >= CAPACIDADE) {
-        cout << "Cadastro cheio: nao cabe mais ninguem.\n";
+    if (!arquivo.is_open()) {
+        cout << "Nenhum arquivo anterior. Comecando com cadastro vazio.\n";
+        return 0;
+    }
+
+    while (getline(arquivo, nome, ',')) {
+        if (!(arquivo >> total)) {
+            break;
+        }
+
+        arquivo.ignore(1000, '\n');
+
+        if (nome.empty() || total < 0 || buscar(apelidos, nome) != -1) {
+            continue;
+        }
+
+        apelidos.push_back(nome);
+        partidas.push_back(total);
+        carregados++;
+    }
+
+    arquivo.close();
+    cout << carregados << " jogador(es) carregado(s).\n";
+    return carregados;
+}
+
+void cadastrar(vector<string> &apelidos, vector<int> &partidas) {
+    string novo = ler_texto("Digite o apelido: ");
+
+    if (novo.empty() || novo.find(',') != string::npos) {
+        cout << "Apelido invalido.\n";
         return;
     }
 
-    cout << "Digite o apelido: ";
-    getline(cin, nome);
-
-    if (nome.empty() || nome.find(',') != string::npos ||
-        nome.length() >= 20) {
-        cout << "Entrada invalida.\n";
+    if (buscar(apelidos, novo) != -1) {
+        cout << "Esse apelido ja esta cadastrado.\n";
         return;
     }
 
-    if (buscar(jogadores, qtd, nome) != -1) {
-        cout << "Esse jogador ja esta cadastrado.\n";
-        return;
-    }
-
-    jogadores[qtd].apelido = nome;
-    jogadores[qtd].partidas = 0;
-    qtd++;
+    apelidos.push_back(novo);
+    partidas.push_back(0);
 
     cout << "Jogador cadastrado com sucesso!\n";
+    salvar(apelidos, partidas);
 }
 
-void listar(Jogador jogadores[], int qtd) {
+void listar(vector<string> &apelidos, vector<int> &partidas) {
     titulo("JOGADORES CADASTRADOS");
 
-    if (qtd == 0) {
-        cout << "Nenhum jogador cadastrado.\n";
+    if (apelidos.empty()) {
+        cout << "Nenhum jogador cadastrado ainda.\n";
         return;
     }
 
-    for (int i = 0; i < qtd; i++) {
-        cout << i + 1 << ". " << jogadores[i].apelido
-             << " - Partidas concluidas: " << jogadores[i].partidas << "\n";
+    for (int i = 0; i < (int)apelidos.size(); i++) {
+        cout << i + 1 << ". " << apelidos[i]
+             << " - " << partidas[i] << " partida(s)\n";
     }
 }
 
-void excluir(Jogador jogadores[], int &qtd) {
-    int numero;
-    int confirmar;
-
-    listar(jogadores, qtd);
-    if (qtd == 0) return;
-
-    cout << "Numero do jogador que deseja excluir: ";
-    numero = lerNumero(1, qtd);
-
-    if (numero == -2) {
-        cout << "Numero invalido.\n";
+void excluir(vector<string> &apelidos, vector<int> &partidas) {
+    if (apelidos.empty()) {
+        cout << "Nenhum jogador para excluir.\n";
         return;
     }
 
-    cout << "Confirmar exclusao? (1 = sim / 0 = nao): ";
-    confirmar = lerNumero(0, 1);
+    listar(apelidos, partidas);
+    int numero = ler_numero("Numero do jogador que deseja excluir: ",
+                            1, (int)apelidos.size());
+    int pos = numero - 1;
 
-    if (confirmar != 1) {
+    int confirmar = ler_numero("Confirmar exclusao? (1 sim / 0 nao): ", 0, 1);
+
+    if (confirmar == 0) {
         cout << "Exclusao cancelada.\n";
         return;
     }
 
-    for (int i = numero - 1; i < qtd - 1; i++) {
-        jogadores[i] = jogadores[i + 1];
-    }
+    apelidos.erase(apelidos.begin() + pos);
+    partidas.erase(partidas.begin() + pos);
 
-    qtd--;
-    salvar(jogadores, qtd);
     cout << "Jogador excluido com sucesso!\n";
+    salvar(apelidos, partidas);
 }
 
-void editar(Jogador jogadores[], int qtd) {
-    int numero;
-    string novo;
-
-    listar(jogadores, qtd);
-    if (qtd == 0) return;
-
-    cout << "Numero do jogador que deseja editar: ";
-    numero = lerNumero(1, qtd);
-
-    if (numero == -2) {
-        cout << "Numero invalido.\n";
+void alterar(vector<string> &apelidos, vector<int> &partidas) {
+    if (apelidos.empty()) {
+        cout << "Nenhum jogador para alterar.\n";
         return;
     }
 
-    cout << "Novo apelido: ";
-    getline(cin, novo);
+    listar(apelidos, partidas);
+    int numero = ler_numero("Numero do jogador que deseja alterar: ",
+                            1, (int)apelidos.size());
+    int pos = numero - 1;
+    string novo = ler_texto("Novo apelido: ");
+
+    int encontrado = buscar(apelidos, novo);
 
     if (novo.empty() || novo.find(',') != string::npos ||
-        novo.length() >= 20) {
-        cout << "Entrada invalida.\n";
+        (encontrado != -1 && encontrado != pos)) {
+        cout << "Apelido invalido ou ja cadastrado.\n";
         return;
     }
 
-    int pos = buscar(jogadores, qtd, novo);
-    if (pos != -1 && pos != numero - 1) {
-        cout << "Esse apelido ja pertence a outro jogador.\n";
-        return;
-    }
-
-    jogadores[numero - 1].apelido = novo;
-    salvar(jogadores, qtd);
-    cout << "Apelido atualizado com sucesso!\n";
+    apelidos[pos] = novo;
+    cout << "Apelido alterado com sucesso!\n";
+    salvar(apelidos, partidas);
 }
 
-int escolherJogador(Jogador jogadores[], int qtd) {
-    string nome;
-
-    cout << "Digite seu apelido: ";
-    getline(cin, nome);
-
-    int pos = buscar(jogadores, qtd, nome);
+int escolher_jogador(vector<string> &apelidos) {
+    string nome = ler_texto("Digite seu apelido: ");
+    int pos = buscar(apelidos, nome);
 
     if (pos == -1) {
-        cout << "Jogador nao cadastrado!\n";
+        cout << "Cadastre esse apelido antes de jogar.\n";
     }
 
     return pos;
 }
 
-void adivinhe(Jogador jogadores[], int qtd) {
-    int pos = escolherJogador(jogadores, qtd);
+void adivinhe(vector<string> &apelidos, vector<int> &partidas) {
+    int pos = escolher_jogador(apelidos);
     if (pos == -1) return;
 
     int segredo = rand() % 100 + 1;
-    int palpite;
     int tentativas = 0;
+    int palpite;
 
     titulo("ADIVINHE O NUMERO");
-    cout << "Adivinhe um numero de 1 a 100!\n";
-    cout << "Digite -1 a qualquer momento para voltar ao menu.\n";
+    cout << "Tente descobrir o numero de 1 a 100.\n";
 
     do {
-        cout << "Seu palpite (-1 para sair): ";
-        palpite = lerNumero(-1, 100);
+        palpite = ler_numero("Seu palpite: ", 1, 100);
+        tentativas++;
 
-        if (palpite == -1) {
-            cout << "Voce saiu do Adivinhe o Numero. Voltando ao menu...\n";
-            return;
-        }
-
-        if (palpite == -2) {
-            cout << "Digite um numero valido de 1 a 100 ou -1 para sair.\n";
-            continue;
-        }
-
-        if (palpite == 0) {
-            cout << "Digite um numero de 1 a 100.\n";
-        } else {
-            tentativas++;
-
-            if (palpite < segredo) {
-                cout << "Maior!\n";
-            } else if (palpite > segredo) {
-                cout << "Menor!\n";
-            } else {
-                cout << "Parabens, " << jogadores[pos].apelido
-                     << "! Voce venceu em " << tentativas
-                     << " tentativa(s)!\n";
-                jogadores[pos].partidas++;
-            }
+        if (palpite < segredo) {
+            cout << "Maior!\n";
+        } else if (palpite > segredo) {
+            cout << "Menor!\n";
         }
     } while (palpite != segredo);
+
+    cout << "Acertou em " << tentativas << " tentativa(s), "
+         << apelidos[pos] << "!\n";
+    partidas[pos]++;
+    salvar(apelidos, partidas);
 }
 
-void caraOuCoroa(Jogador jogadores[], int qtd) {
-    int pos = escolherJogador(jogadores, qtd);
+void cara_ou_coroa(vector<string> &apelidos, vector<int> &partidas) {
+    int pos = escolher_jogador(apelidos);
     if (pos == -1) return;
-
-    int escolha;
-    int resultado = rand() % 2;
 
     titulo("CARA OU COROA");
-    cout << "1 - Cara\n2 - Coroa\n0 - Voltar ao menu\n";
-    cout << "Sua escolha: ";
-    escolha = lerNumero(0, 2);
+    cout << "1 - Cara\n2 - Coroa\n";
+    int escolha = ler_numero("Sua escolha: ", 1, 2);
+    int resultado = rand() % 2 + 1;
 
-    if (escolha == -2) {
-        cout << "Escolha invalida.\n";
-        return;
-    }
-    if (escolha == 0) return;
+    cout << "A moeda caiu em " << (resultado == 1 ? "Cara" : "Coroa")
+         << ".\n";
 
-    cout << "A moeda caiu em: " << (resultado == 0 ? "Cara" : "Coroa") << "!\n";
-
-    if (escolha == resultado + 1) {
-        cout << "Voce venceu, " << jogadores[pos].apelido << "!\n";
+    if (escolha == resultado) {
+        cout << "Voce venceu, " << apelidos[pos] << "!\n";
     } else {
-        cout << "O computador venceu esta rodada!\n";
+        cout << "O computador venceu esta rodada.\n";
     }
 
-    jogadores[pos].partidas++;
+    partidas[pos]++;
+    salvar(apelidos, partidas);
 }
 
-void pedraPapelTesoura(Jogador jogadores[], int qtd) {
-    int pos = escolherJogador(jogadores, qtd);
+void pedra_papel_tesoura(vector<string> &apelidos, vector<int> &partidas) {
+    int pos = escolher_jogador(apelidos);
     if (pos == -1) return;
 
-    int escolha;
+    titulo("PEDRA, PAPEL E TESOURA");
+    cout << "1 - Pedra\n2 - Papel\n3 - Tesoura\n";
+    int escolha = ler_numero("Sua escolha: ", 1, 3);
     int computador = rand() % 3 + 1;
     string opcoes[4] = {"", "Pedra", "Papel", "Tesoura"};
 
-    titulo("PEDRA, PAPEL E TESOURA");
-    cout << "1 - Pedra\n2 - Papel\n3 - Tesoura\n0 - Voltar ao menu\n";
-    cout << "Sua escolha: ";
-    escolha = lerNumero(0, 3);
-
-    if (escolha == -2) {
-        cout << "Escolha invalida.\n";
-        return;
-    }
-    if (escolha == 0) return;
-
-    cout << "Voce escolheu: " << opcoes[escolha] << "\n";
-    cout << "Computador escolheu: " << opcoes[computador] << "\n";
+    cout << "Voce: " << opcoes[escolha] << "\n";
+    cout << "Computador: " << opcoes[computador] << "\n";
 
     if (escolha == computador) {
         cout << "Empate!\n";
     } else if ((escolha == 1 && computador == 3) ||
                (escolha == 2 && computador == 1) ||
                (escolha == 3 && computador == 2)) {
-        cout << "Parabens, " << jogadores[pos].apelido << "! Voce venceu!\n";
+        cout << "Voce venceu, " << apelidos[pos] << "!\n";
     } else {
-        cout << "O computador venceu esta rodada!\n";
+        cout << "O computador venceu.\n";
     }
 
-    jogadores[pos].partidas++;
+    partidas[pos]++;
+    salvar(apelidos, partidas);
 }
 
-void parOuImpar(Jogador jogadores[], int qtd) {
-    int pos = escolherJogador(jogadores, qtd);
+bool eh_par(int numero) {
+    return numero % 2 == 0;
+}
+
+void par_ou_impar(vector<string> &apelidos, vector<int> &partidas) {
+    int pos = escolher_jogador(apelidos);
     if (pos == -1) return;
 
-    int escolha;
-    int numero;
-    int numeroPc = rand() % 11;
-    int soma;
-
     titulo("PAR OU IMPAR");
-    cout << "1 - Par\n2 - Impar\n0 - Voltar ao menu\n";
-    cout << "Escolha: ";
-    escolha = lerNumero(0, 2);
-
-    if (escolha == -2) {
-        cout << "Escolha invalida.\n";
-        return;
-    }
-    if (escolha == 0) return;
-
-    cout << "Escolha um numero de 0 a 10: ";
-    numero = lerNumero(0, 10);
-
-    if (numero == -2) {
-        cout << "Numero invalido.\n";
-        return;
-    }
-
-    soma = numero + numeroPc;
+    cout << "1 - Par\n2 - Impar\n";
+    int escolha = ler_numero("Sua escolha: ", 1, 2);
+    int numero = ler_numero("Escolha um numero de 0 a 10: ", 0, 10);
+    int numero_pc = rand() % 11;
+    int soma = numero + numero_pc;
 
     cout << "Voce escolheu " << numero << " e o computador escolheu "
-         << numeroPc << ".\n";
-    cout << "Soma: " << soma << " - " << (soma % 2 == 0 ? "Par" : "Impar") << "\n";
+         << numero_pc << ".\n";
+    cout << "Soma: " << soma << " - "
+         << (eh_par(soma) ? "Par" : "Impar") << "\n";
 
-    if ((soma % 2 == 0 && escolha == 1) ||
-        (soma % 2 != 0 && escolha == 2)) {
-        cout << "Parabens, " << jogadores[pos].apelido << "! Voce venceu!\n";
+    if ((eh_par(soma) && escolha == 1) ||
+        (!eh_par(soma) && escolha == 2)) {
+        cout << "Voce venceu, " << apelidos[pos] << "!\n";
     } else {
-        cout << "O computador venceu!\n";
+        cout << "O computador venceu.\n";
     }
 
-    jogadores[pos].partidas++;
+    partidas[pos]++;
+    salvar(apelidos, partidas);
 }
 
-struct Carta {
-    int cor;
-    int numero;
-};
-
-string cores[4] = {"Vermelho", "Azul", "Verde", "Amarelo"};
-
-void mostrarCarta(Carta carta) {
+void mostrar_carta(Carta carta) {
     cout << cores[carta.cor] << " " << carta.numero;
 }
 
-bool podeJogar(Carta carta, Carta topo) {
+bool pode_jogar(Carta carta, Carta topo) {
     return carta.cor == topo.cor || carta.numero == topo.numero;
 }
 
-void removerCarta(Carta mao[], int &qtd, int indice) {
-    for (int i = indice; i < qtd - 1; i++) {
-        mao[i] = mao[i + 1];
-    }
-    qtd--;
-}
-
-void uno(Jogador jogadores[], int qtd) {
-    int pos = escolherJogador(jogadores, qtd);
+void uno(vector<string> &apelidos, vector<int> &partidas) {
+    int pos = escolher_jogador(apelidos);
     if (pos == -1) return;
 
-    const int TOTAL_CARTAS = 76;
-    const int LIMITE_RODADAS = 13;
-    Carta baralho[TOTAL_CARTAS];
-    Carta mao[80];
-    Carta computador[80];
-    int proxima = 0;
-    int qtdMao = 7;
-    int qtdPc = 7;
-    int rodadas = 0;
+    vector<Carta> baralho;
+    vector<Carta> mao;
+    vector<Carta> computador;
 
     for (int cor = 0; cor < 4; cor++) {
-        baralho[proxima].cor = cor;
-        baralho[proxima].numero = 0;
-        proxima++;
-
-        for (int numero = 1; numero <= 9; numero++) {
-            for (int repeticao = 0; repeticao < 2; repeticao++) {
-                baralho[proxima].cor = cor;
-                baralho[proxima].numero = numero;
-                proxima++;
-            }
+        for (int numero = 0; numero <= 9; numero++) {
+            Carta carta;
+            carta.cor = cor;
+            carta.numero = numero;
+            baralho.push_back(carta);
         }
     }
 
-    for (int i = TOTAL_CARTAS - 1; i > 0; i--) {
+    for (int i = (int)baralho.size() - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         Carta temp = baralho[i];
         baralho[i] = baralho[j];
         baralho[j] = temp;
     }
 
-    proxima = 0;
-    for (int i = 0; i < 7; i++) {
-        mao[i] = baralho[proxima++];
-        computador[i] = baralho[proxima++];
+    for (int i = 0; i < 5; i++) {
+        mao.push_back(baralho.back());
+        baralho.pop_back();
+        computador.push_back(baralho.back());
+        baralho.pop_back();
     }
 
-    Carta topo = baralho[proxima++];
+    Carta topo = baralho.back();
+    baralho.pop_back();
 
-    titulo("UNO - VERSAO SIMPLIFICADA");
+    titulo("UNO SIMPLIFICADO");
     cout << "Combine a cor ou o numero da carta do topo.\n";
-    cout << "A partida tem limite de " << LIMITE_RODADAS << " rodadas.\n";
+    int rodadas = 0;
 
-    while (qtdMao > 0 && qtdPc > 0 && rodadas < LIMITE_RODADAS) {
-        int escolha;
+    while (!mao.empty() && !computador.empty() && rodadas < 20) {
+        cout << "\nCarta no topo: ";
+        mostrar_carta(topo);
+        cout << "\nSuas cartas:\n";
 
-        cout << "\n--- Rodada " << rodadas + 1 << " de " << LIMITE_RODADAS << " ---\n";
-        cout << "Carta no topo: ";
-        mostrarCarta(topo);
-        cout << "\n\nSuas cartas:\n";
-
-        for (int i = 0; i < qtdMao; i++) {
+        for (int i = 0; i < (int)mao.size(); i++) {
             cout << i + 1 << " - ";
-            mostrarCarta(mao[i]);
-            if (podeJogar(mao[i], topo)) cout << " [pode jogar]";
+            mostrar_carta(mao[i]);
+            if (pode_jogar(mao[i], topo)) cout << " [pode jogar]";
             cout << "\n";
         }
 
-        cout << "Digite o numero da carta, 0 para comprar ou -1 para sair: ";
-        escolha = lerNumero(-1, qtdMao);
+        int escolha = ler_numero("Carta (0 compra, -1 sai): ",
+                                 -1, (int)mao.size());
 
         if (escolha == -1) {
-            cout << "Voce saiu do UNO. A partida foi encerrada.\n";
+            cout << "Voce saiu do UNO.\n";
             return;
         }
 
-        if (escolha == -2) {
-            cout << "Entrada invalida. Escolha uma carta, 0 para comprar ou -1 para sair.\n";
-            continue;
-        }
-
         if (escolha == 0) {
-            if (proxima >= TOTAL_CARTAS) {
-                cout << "O baralho acabou. A partida terminou empatada.\n";
-                jogadores[pos].partidas++;
-                return;
+            if (baralho.empty()) {
+                cout << "O baralho acabou.\n";
+                break;
             }
-
-            Carta comprada = baralho[proxima++];
-            mao[qtdMao++] = comprada;
-            cout << "Voce comprou: ";
-            mostrarCarta(comprada);
-            cout << "\n";
-
-            if (podeJogar(comprada, topo)) {
-                char resposta;
-                cout << "Deseja jogar a carta comprada? (s/n): ";
-                cin >> resposta;
-                cin.ignore(1000, '\n');
-
-                if (resposta == 's' || resposta == 'S') {
-                    topo = comprada;
-                    removerCarta(mao, qtdMao, qtdMao - 1);
+            mao.push_back(baralho.back());
+            baralho.pop_back();
+            cout << "Voce comprou uma carta.\n";
+            if (pode_jogar(mao.back(), topo)) {
+                cout << "A carta comprada pode ser jogada.\n";
+                int jogar = ler_numero("1 jogar / 0 guardar: ", 0, 1);
+                if (jogar == 1) {
+                    topo = mao.back();
+                    mao.pop_back();
                 }
             }
-        } else if (escolha >= 1 && escolha <= qtdMao &&
-                   podeJogar(mao[escolha - 1], topo)) {
+        } else if (pode_jogar(mao[escolha - 1], topo)) {
             topo = mao[escolha - 1];
-            removerCarta(mao, qtdMao, escolha - 1);
+            mao.erase(mao.begin() + escolha - 1);
         } else {
-            cout << "Jogada invalida! Escolha uma carta permitida ou 0 para comprar.\n";
+            cout << "Essa carta nao pode ser jogada.\n";
             continue;
         }
 
-        if (qtdMao == 0) break;
+        if (mao.empty()) break;
 
-        int indice = -1;
-        for (int i = 0; i < qtdPc; i++) {
-            if (podeJogar(computador[i], topo)) {
-                indice = i;
+        int pos_pc = -1;
+        for (int i = 0; i < (int)computador.size(); i++) {
+            if (pode_jogar(computador[i], topo)) {
+                pos_pc = i;
                 break;
             }
         }
 
-        if (indice != -1) {
-            topo = computador[indice];
-            cout << "Computador jogou: ";
-            mostrarCarta(topo);
-            cout << "\n";
-            removerCarta(computador, qtdPc, indice);
-        } else if (proxima < TOTAL_CARTAS) {
-            computador[qtdPc++] = baralho[proxima++];
-            cout << "Computador comprou uma carta.\n";
+        if (pos_pc != -1) {
+            topo = computador[pos_pc];
+            computador.erase(computador.begin() + pos_pc);
+            cout << "O computador jogou uma carta.\n";
+        } else if (!baralho.empty()) {
+            computador.push_back(baralho.back());
+            baralho.pop_back();
+            cout << "O computador comprou uma carta.\n";
         }
 
         rodadas++;
     }
 
-    if (qtdMao == 0) {
-        cout << "Parabens, " << jogadores[pos].apelido << "! Voce venceu o UNO!\n";
-    } else if (qtdPc == 0) {
-        cout << "O computador venceu o UNO!\n";
+    if (mao.empty()) {
+        cout << "Voce venceu o UNO, " << apelidos[pos] << "!\n";
+    } else if (computador.empty()) {
+        cout << "O computador venceu o UNO.\n";
     } else {
         cout << "A partida terminou empatada.\n";
     }
 
-    jogadores[pos].partidas++;
+    partidas[pos]++;
+    salvar(apelidos, partidas);
 }
 
-void mostrarMenu() {
+void ranking(vector<string> &apelidos, vector<int> &partidas) {
+    vector<int> ordem;
+
+    for (int i = 0; i < (int)apelidos.size(); i++) {
+        ordem.push_back(i);
+    }
+
+    for (int i = 0; i < (int)ordem.size(); i++) {
+        for (int j = i + 1; j < (int)ordem.size(); j++) {
+            if (partidas[ordem[j]] > partidas[ordem[i]]) {
+                int temp = ordem[i];
+                ordem[i] = ordem[j];
+                ordem[j] = temp;
+            }
+        }
+    }
+
+    titulo("RANKING DE JOGADORES");
+
+    if (ordem.empty()) {
+        cout << "Nenhum jogador cadastrado.\n";
+        return;
+    }
+
+    for (int i = 0; i < (int)ordem.size(); i++) {
+        int pos = ordem[i];
+        cout << i + 1 << ". " << apelidos[pos]
+             << " - " << partidas[pos] << " partida(s)\n";
+    }
+}
+
+void mostrar_menu() {
     titulo("FLIPERAMA EM C++");
-    cout << "Desenvolvido por: Rafael Glinski de Oliveira\n";
+    cout << "Desenvolvido por: " << DONO << "\n";
     cout << "[1] Adivinhe o Numero\n";
     cout << "[2] Cadastrar jogador\n";
     cout << "[3] Listar jogadores\n";
-    cout << "[4] Remover jogador\n";
+    cout << "[4] Excluir jogador\n";
     cout << "[5] Cara ou Coroa\n";
-    cout << "[6] UNO\n";
+    cout << "[6] UNO simplificado\n";
     cout << "[7] Pedra, Papel e Tesoura\n";
-    cout << "[8] Editar apelido\n";
+    cout << "[8] Alterar apelido\n";
     cout << "[9] Par ou Impar\n";
+    cout << "[10] Ranking\n";
     cout << "[0] Salvar e sair\n";
     linha();
-    cout << "Sua escolha: ";
 }
 
 int main() {
-    Jogador jogadores[CAPACIDADE];
-    int qtd = 0;
-    int opcao = -1;
+    vector<string> apelidos;
+    vector<int> partidas;
+    int opcao;
+    srand((unsigned int)time(NULL));
 
-    srand((unsigned int) time(0));
-    carregar(jogadores, qtd);
+    int carregados = carregar(apelidos, partidas);
+    cout << "O programa iniciou com " << carregados
+         << " jogador(es) carregado(s).\n";
 
     do {
-        mostrarMenu();
-        opcao = lerNumero(0, 9);
-
-        if (opcao == -2) {
-            if (cin.eof()) {
-                salvar(jogadores, qtd);
-                opcao = 0;
-                continue;
-            }
-            cout << "Digite uma opcao valida de 0 a 9.\n\n";
-            continue;
-        }
+        mostrar_menu();
+        opcao = ler_numero("Sua escolha: ", 0, 10);
 
         switch (opcao) {
             case 1:
-                adivinhe(jogadores, qtd);
+                adivinhe(apelidos, partidas);
                 break;
             case 2:
-                cadastrar(jogadores, qtd);
+                cadastrar(apelidos, partidas);
                 break;
             case 3:
-                listar(jogadores, qtd);
+                listar(apelidos, partidas);
                 break;
             case 4:
-                excluir(jogadores, qtd);
+                excluir(apelidos, partidas);
                 break;
             case 5:
-                caraOuCoroa(jogadores, qtd);
+                cara_ou_coroa(apelidos, partidas);
                 break;
             case 6:
-                uno(jogadores, qtd);
+                uno(apelidos, partidas);
                 break;
             case 7:
-                pedraPapelTesoura(jogadores, qtd);
+                pedra_papel_tesoura(apelidos, partidas);
                 break;
             case 8:
-                editar(jogadores, qtd);
+                alterar(apelidos, partidas);
                 break;
             case 9:
-                parOuImpar(jogadores, qtd);
+                par_ou_impar(apelidos, partidas);
+                break;
+            case 10:
+                ranking(apelidos, partidas);
                 break;
             case 0:
-                salvar(jogadores, qtd);
+                salvar(apelidos, partidas);
                 cout << "Dados salvos. Ate a proxima!\n";
                 break;
         }
 
         if (opcao != 0) {
-            salvar(jogadores, qtd);
+            salvar(apelidos, partidas);
         }
 
         cout << "\n";
