@@ -1,3 +1,4 @@
 prog-c/*
 !prog-c/*.c
 fliperama.c/fliperama
+fliperama-cpp/fliperama
