@@ -70,14 +70,23 @@ void carregar(Jogador jogadores[], int &qtd) {
         return;
     }
 
-    string nome;
-    int total;
+    string linhaArquivo;
     qtd = 0;
 
-    while (getline(arquivo, nome, ',') && arquivo >> total) {
-        arquivo.ignore(1000, '\n');
+    while (getline(arquivo, linhaArquivo)) {
+        stringstream fluxo(linhaArquivo);
+        string nome;
+        int total;
+        char extra;
 
-        if (nome.empty() || total < 0 || qtd >= CAPACIDADE) {
+        if (!getline(fluxo, nome, ',') || !(fluxo >> total) ||
+            (fluxo >> extra)) {
+            continue;
+        }
+
+        if (nome.empty() || nome.length() >= 20 ||
+            nome.find('\\r') != string::npos || total < 0 ||
+            qtd >= CAPACIDADE) {
             continue;
         }
 
