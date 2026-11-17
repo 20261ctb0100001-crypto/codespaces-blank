@@ -1,37 +1,94 @@
 # Fliperama em C++
 
-## Sobre o projeto
+## 1. Sobre o projeto
 
-Esta é a versão em C++ do Fliperama desenvolvido anteriormente em C. O programa funciona no terminal, permite cadastrar jogadores e oferece jogos contra o computador. Os apelidos e a quantidade de partidas concluídas são guardados no arquivo `jogadores.csv`.
+Este projeto é a versão em C++ do Fliperama que foi desenvolvido anteriormente em C. Ele funciona pelo terminal e reúne um cadastro de jogadores, cinco jogos contra o computador e um placar simples. Os dados são guardados no arquivo `jogadores.csv`, para continuarem disponíveis quando o programa for aberto novamente.
 
-## Funcionalidades
+## 2. Funcionalidades
 
-- Cadastrar, listar, editar e remover jogadores.
+### Cadastro de jogadores
+- Cadastrar jogadores com apelido.
+- Listar os jogadores cadastrados e a quantidade de partidas concluídas.
+- Editar apelidos.
+- Excluir jogadores com confirmação.
 - Limite de 50 jogadores.
-- Impedir apelidos vazios, repetidos ou com vírgula.
-- Salvar e carregar os dados em arquivo CSV.
-- Adivinhe o Número.
-- Cara ou Coroa.
-- UNO simplificado.
-- Pedra, Papel e Tesoura.
-- Par ou Ímpar.
+- Não permite apelidos vazios, repetidos, com vírgula ou com 20 caracteres ou mais.
 
-## Como compilar e executar
+### Jogos
+- **Adivinhe o Número:** descobrir um número aleatório entre 1 e 100.
+- **Cara ou Coroa:** escolher um lado da moeda.
+- **UNO simplificado:** combinar a cor ou o número das cartas; é possível comprar cartas e sair da partida.
+- **Pedra, Papel e Tesoura:** jogar contra o computador.
+- **Par ou Ímpar:** escolher par ou ímpar e um número de 0 a 10.
 
-No terminal do GitHub Codespaces, entre na pasta do projeto e execute:
+Nos jogos que oferecem a opção, digite o número indicado para voltar ao menu. No Adivinhe o Número e no UNO, digite `-1` para sair da partida.
+
+## 3. Organização dos arquivos
+
+```text
+fliperama-cpp/
+├── fliperama.cpp   # Código-fonte do programa
+├── jogadores.csv  # Dados iniciais dos jogadores
+├── testar.sh      # Testes automatizados
+└── README.md      # Documentação
+```
+
+O programa principal fica em um único arquivo `.cpp` para manter a implementação simples e fácil de compilar. O script `testar.sh` é separado porque serve apenas para conferir o funcionamento; ele não é necessário para abrir o jogo.
+
+## 4. Como compilar e executar
+
+No terminal do GitHub Codespaces, execute:
 
 ```bash
-cd fliperama-cpp
+cd /workspaces/codespaces-blank/fliperama-cpp
 g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
 ./fliperama
 ```
 
-O executável é criado localmente e não precisa ser enviado ao GitHub.
+O comando de compilação cria o executável local `fliperama`. Esse arquivo não deve ser enviado ao GitHub; o `.gitignore` já está configurado para ignorá-lo.
 
-## O que mudou de C para C++
+## 5. Como testar
 
-A lógica principal foi mantida, mas a versão C++ usa recursos próprios da linguagem, como `cout` e `cin` para entrada e saída, `string` para apelidos, `ifstream` e `ofstream` para ler e gravar o CSV, além de uma estrutura `struct Jogador` para reunir os dados de cada participante.
+Para compilar e executar os testes automatizados:
 
-## Uso de ferramentas de IA
+```bash
+cd /workspaces/codespaces-blank/fliperama-cpp
+bash testar.sh
+```
 
-O ChatGPT foi utilizado como apoio para converter a versão anterior em C++ e revisar a organização do código. O código deve ser compilado e testado pelo estudante, que deve revisar as funções e compreender as alterações antes da entrega.
+O script usa uma pasta temporária e uma cópia do CSV. Assim, os testes de cadastro, edição e exclusão não alteram o arquivo de jogadores do projeto. Ele verifica a compilação, a abertura dos cinco jogos, operações do cadastro e o salvamento dos dados.
+
+Os testes automatizados são uma conferência inicial. Também é importante abrir o programa e jogar manualmente para conferir as mensagens e as regras de cada partida.
+
+## 6. Arquivo de jogadores
+
+Cada linha de `jogadores.csv` segue este formato:
+
+```text
+apelido,partidas
+```
+
+Exemplo:
+
+```text
+rafael,0
+renan,0
+pedro,0
+```
+
+Não coloque vírgulas nos apelidos, porque a vírgula separa os campos do CSV.
+
+## 7. O que foi utilizado de C++
+
+A versão utiliza:
+- `struct` para agrupar os dados de cada jogador e de cada carta.
+- `string` para trabalhar com apelidos.
+- `cin` e `cout` para entrada e saída.
+- `ifstream` e `ofstream` para carregar e salvar o arquivo.
+- Funções, vetores, estruturas condicionais e laços de repetição.
+
+A lógica dos jogos e do cadastro foi adaptada da versão anterior em C para utilizar recursos de C++.
+
+## 8. Uso de ferramentas de IA
+
+O ChatGPT foi utilizado como apoio na adaptação do projeto de C para C++, na revisão da leitura de dados, na preparação dos testes e na organização deste README. O estudante deve revisar o código, executar os testes e compreender as funções antes da apresentação ou entrega.
