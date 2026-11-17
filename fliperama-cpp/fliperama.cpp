@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <cstdlib>
 #include <ctime>
 
@@ -39,19 +40,23 @@ int buscar(Jogador jogadores[], int qtd, string nome) {
 }
 
 int lerNumero(int minimo, int maximo) {
+    string entrada;
     int numero;
-    cin >> numero;
+    char extra;
+    stringstream fluxo;
 
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(1000, '\n');
-        return -1;
+    if (!getline(cin, entrada)) {
+        return -2;
     }
 
-    cin.ignore(1000, '\n');
+    fluxo.str(entrada);
+
+    if (!(fluxo >> numero) || (fluxo >> extra)) {
+        return -2;
+    }
 
     if (numero < minimo || numero > maximo) {
-        return -1;
+        return -2;
     }
 
     return numero;
@@ -156,7 +161,7 @@ void excluir(Jogador jogadores[], int &qtd) {
     cout << "Numero do jogador que deseja excluir: ";
     numero = lerNumero(1, qtd);
 
-    if (numero == -1) {
+    if (numero == -2) {
         cout << "Numero invalido.\n";
         return;
     }
@@ -188,7 +193,7 @@ void editar(Jogador jogadores[], int qtd) {
     cout << "Numero do jogador que deseja editar: ";
     numero = lerNumero(1, qtd);
 
-    if (numero == -1) {
+    if (numero == -2) {
         cout << "Numero invalido.\n";
         return;
     }
@@ -245,8 +250,13 @@ void adivinhe(Jogador jogadores[], int qtd) {
         palpite = lerNumero(-1, 100);
 
         if (palpite == -1) {
-            cout << "Entrada invalida ou voce saiu da partida.\n";
+            cout << "Voce saiu do Adivinhe o Numero. Voltando ao menu...\n";
             return;
+        }
+
+        if (palpite == -2) {
+            cout << "Digite um numero valido de 1 a 100 ou -1 para sair.\n";
+            continue;
         }
 
         if (palpite == 0) {
@@ -280,7 +290,7 @@ void caraOuCoroa(Jogador jogadores[], int qtd) {
     cout << "Sua escolha: ";
     escolha = lerNumero(0, 2);
 
-    if (escolha == -1) {
+    if (escolha == -2) {
         cout << "Escolha invalida.\n";
         return;
     }
@@ -355,7 +365,7 @@ void parOuImpar(Jogador jogadores[], int qtd) {
     cout << "Escolha um numero de 0 a 10: ";
     numero = lerNumero(0, 10);
 
-    if (numero == -1) {
+    if (numero == -2) {
         cout << "Numero invalido.\n";
         return;
     }
@@ -468,6 +478,11 @@ void uno(Jogador jogadores[], int qtd) {
             return;
         }
 
+        if (escolha == -2) {
+            cout << "Entrada invalida. Escolha uma carta, 0 para comprar ou -1 para sair.\n";
+            continue;
+        }
+
         if (escolha == 0) {
             if (proxima >= TOTAL_CARTAS) {
                 cout << "O baralho acabou. A partida terminou empatada.\n";
@@ -565,7 +580,7 @@ int main() {
         mostrarMenu();
         opcao = lerNumero(0, 9);
 
-        if (opcao == -1) {
+        if (opcao == -2) {
             cout << "Digite uma opcao valida de 0 a 9.\n\n";
             continue;
         }
