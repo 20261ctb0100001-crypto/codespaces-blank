@@ -29,11 +29,10 @@ Nos jogos que oferecem a opção, digite o número indicado para voltar ao menu.
 fliperama-cpp/
 ├── fliperama.cpp   # Código-fonte do programa
 ├── jogadores.csv  # Dados iniciais dos jogadores
-├── testar.sh      # Testes automatizados
 └── README.md      # Documentação
 ```
 
-O programa principal fica em um único arquivo `.cpp` para manter a implementação simples e fácil de compilar. O script `testar.sh` é separado porque serve apenas para conferir o funcionamento; ele não é necessário para abrir o jogo.
+O programa principal fica em um único arquivo `.cpp` para manter a implementação simples e fácil de compilar.
 
 ## 4. Como compilar e executar
 
@@ -47,20 +46,7 @@ g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
 
 O comando de compilação cria o executável local `fliperama`. Esse arquivo não deve ser enviado ao GitHub; o `.gitignore` já está configurado para ignorá-lo.
 
-## 5. Como testar
-
-Para compilar e executar os testes automatizados:
-
-```bash
-cd /workspaces/codespaces-blank/fliperama-cpp
-bash testar.sh
-```
-
-O script usa uma pasta temporária e uma cópia do CSV. Assim, os testes de cadastro, edição e exclusão não alteram o arquivo de jogadores do projeto. Ele verifica a compilação, a abertura dos cinco jogos, operações do cadastro e o salvamento dos dados.
-
-Os testes automatizados são uma conferência inicial. Também é importante abrir o programa e jogar manualmente para conferir as mensagens e as regras de cada partida.
-
-## 6. Arquivo de jogadores
+## 5. Arquivo de jogadores
 
 Cada linha de `jogadores.csv` segue este formato:
 
@@ -78,7 +64,7 @@ pedro,0
 
 Não coloque vírgulas nos apelidos, porque a vírgula separa os campos do CSV.
 
-## 7. O que foi utilizado de C++
+## 6. O que foi utilizado de C++
 
 A versão utiliza:
 - `struct` para agrupar os dados de cada jogador e de cada carta.
@@ -89,6 +75,6 @@ A versão utiliza:
 
 A lógica dos jogos e do cadastro foi adaptada da versão anterior em C para utilizar recursos de C++.
 
-## 8. Uso de ferramentas de IA
+## 7. Uso de ferramentas de IA
 
-O ChatGPT foi utilizado como apoio na adaptação do projeto de C para C++, na revisão da leitura de dados, na preparação dos testes e na organização deste README. O estudante deve revisar o código, executar os testes e compreender as funções antes da apresentação ou entrega.
+O ChatGPT foi utilizado como apoio na adaptação do projeto de C para C++, na revisão da leitura de dados e na organização deste README. O estudante deve revisar o código, executar o programa e compreender as funções antes da apresentação ou entrega.
