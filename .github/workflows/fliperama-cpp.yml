@@ -1,0 +1,26 @@
+name: Validar Fliperama em C++
+
+on:
+  push:
+    paths:
+      - "fliperama-cpp/**"
+      - ".github/workflows/fliperama-cpp.yml"
+  pull_request:
+    paths:
+      - "fliperama-cpp/**"
+      - ".github/workflows/fliperama-cpp.yml"
+
+jobs:
+  compilar-e-testar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Compilar com avisos
+        working-directory: fliperama-cpp
+        run: g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
+
+      - name: Teste basico de inicializacao e saida
+        working-directory: fliperama-cpp
+        run: printf "0\n" | ./fliperama
