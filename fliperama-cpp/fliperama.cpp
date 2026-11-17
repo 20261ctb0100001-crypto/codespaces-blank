@@ -356,7 +356,7 @@ void parOuImpar(Jogador jogadores[], int qtd) {
     cout << "Escolha: ";
     escolha = lerNumero(0, 2);
 
-    if (escolha == -1) {
+    if (escolha == -2) {
         cout << "Escolha invalida.\n";
         return;
     }
