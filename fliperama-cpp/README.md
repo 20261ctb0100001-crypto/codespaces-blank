@@ -1,12 +1,15 @@
 # Fliperama em C++ (MeuApp v4.0)
 
-## O que e
+## 1. O que e
 
-Este programa de terminal continua o Fliperama que foi feito antes em C. Ele tem cadastro de jogadores, jogos contra o computador, ranking e salvamento das partidas em um arquivo CSV.
+Este programa e a versao em C++ do Fliperama desenvolvido anteriormente em C na disciplina 2026-PCAP.
+Ele permite cadastrar jogadores, jogar contra o computador, consultar o ranking e guardar os dados em um arquivo CSV.
 
-O ChatGPT foi usado como apoio para adaptar o codigo para C++, revisar o funcionamento e organizar este README. O codigo e as decisoes do projeto precisam ser revisados e compreendidos pelo estudante.
+O programa possui os jogos Adivinhe o Numero, Cara ou Coroa, UNO simplificado, Pedra, Papel e Tesoura e Par ou Impar. Tambem permite listar, alterar e excluir jogadores.
 
-## Como compilar e rodar
+O ChatGPT foi usado como apoio para adaptar o codigo para C++, revisar o funcionamento e organizar este README. O estudante deve compreender e revisar o codigo entregue.
+
+## 2. Como compilar e rodar
 
 Dentro da pasta `fliperama-cpp`, execute:
 
@@ -15,66 +18,39 @@ g++ -std=c++11 -Wall -Wextra -pedantic -Werror fliperama.cpp -o fliperama
 ./fliperama
 ```
 
-O executavel `fliperama` e criado somente no ambiente local e nao deve ser enviado ao GitHub.
+A compilacao deve terminar sem avisos ou erros. O executavel `fliperama` e gerado localmente e nao deve ser enviado ao GitHub.
 
-## Arquivos
+## 3. Arquivos
 
-- `fliperama.cpp`: menu, cadastro, jogos, ranking e funcoes para salvar e carregar os dados.
-- `jogadores.csv`: apelido e quantidade de partidas de cada jogador, separados por virgula.
-- `README.md`: explicacao do projeto, comparacao entre C e C++ e autoavaliacao.
+- `fliperama.cpp`: menu, cadastro, jogos, ranking e funcoes de leitura e gravacao.
+- `jogadores.csv`: apelidos e quantidade de partidas de cada jogador, separados por virgula.
+- `README.md`: instrucoes, comparacao entre C e C++ e autoavaliacao.
 
-## C x C++: o que mudou
+## 4. C x C++: o que mudou
 
-| O que | No fliperama.c (linha) | No fliperama.cpp (linha) |
+Os numeros indicam as linhas dos arquivos atuais. Na versao em C, a funcao de cadastro recebe o total por ponteiro (`int *qtd`); na versao C++, os dois vectors sao recebidos por referencia.
+
+| O que | No fliperama.c | No fliperama.cpp |
 |---|---|---|
-| Guardar um jogador | `strcpy(apelidos[*qtd], nome)` (160) | `apelidos.push_back(novo)` (144) |
-| Comparar apelidos | `strcmp(apelidos[i], procurado) == 0` (42) | `apelidos[i] == procurado` (76) |
-| Funcao que cadastra | `void cadastrar(char apelidos[][TAM_APELIDO], ...)` (139) | `void cadastrar(vector<string> &apelidos, ...)` (131) |
-| Ler uma opcao | `fgets` e `strtol` (57) | `cin >> numero` (43) |
-| Salvar e carregar | `fopen` (127) | `ofstream` (85) e `ifstream` (100) |
-| Vetor de apelidos | `char apelidos[CAPACIDADE][TAM_APELIDO]` (638) | `vector<string> apelidos` (511) |
+| Guardar um jogador | `strcpy(apelidos[*qtd], nome)` (linha 160) | `apelidos.push_back(novo)` (linha 144) |
+| Comparar apelidos | `strcmp(apelidos[i], procurado) == 0` (linha 42) | `apelidos[i] == procurado` (linha 76) |
+| Funcao de cadastro | `void cadastrar(..., int *qtd)` (linha 139) | `void cadastrar(vector<string> &apelidos, vector<int> &partidas)` (linha 131) |
 
-## O que o C++ decidiu por mim
+## 5. O que o C++ decidiu por mim
 
-Com `string`, nao preciso copiar apelidos com `strcpy` nem comparar texto com `strcmp`: posso usar atribuicao e `==`.
+Com `string`, o programa pode guardar e comparar apelidos sem usar diretamente arrays de caracteres, `strcpy` e `strcmp`.
+Com `vector`, a lista pode aumentar com `push_back` e diminuir com `erase`, sem manter manualmente uma capacidade fixa e uma variavel de quantidade.
 
-Com `vector`, a lista pode crescer com `push_back` e diminuir com `erase`, sem definir uma capacidade fixa para o cadastro.
+Mesmo usando vectors, eu preciso passar as listas por referencia (`&`) nas funcoes que alteram os dados. Tambem preciso manter apelidos e partidas na mesma posicao para que cada jogador continue associado ao seu numero de partidas.
 
-A funcao `cadastrar` passou a ser `void` porque recebe os dois vectors por referencia e altera os dados originais. Assim, ela nao precisa devolver a quantidade de jogadores.
+## 6. Autoavaliacao
 
-### O que continua comigo
-
-Eu ainda preciso passar os vectors por referencia (`&`) nas funcoes que trabalham com o cadastro, para que as mudancas aparecam no `main`.
-
-Tambem preciso manter `apelidos` e `partidas` na mesma posicao: quando cadastro ou excluo alguem, as duas listas devem mudar juntas. O ranking usa indices para nao separar esses dados nem mudar a ordem original do cadastro.
-
-### Exemplo de execucao
-
-Trecho de uma abertura com tres registros no arquivo:
-
-```text
-3 jogador(es) carregado(s).
-O programa iniciou com 3 jogador(es) carregado(s).
-========================================
-FLIPERAMA EM C++
-========================================
-Desenvolvido por: Rafael Glinski de Oliveira
-[1] Adivinhe o Numero
-[2] Cadastrar jogador
-[3] Listar jogadores
-...
-[10] Ranking
-[0] Salvar e sair
-========================================
-Sua escolha:
-```
-
-## Autoavaliacao
-
-| Criterio | Conceito que espero | Onde se prova (arquivo e linha) |
+| Criterio | Conceito que espero | Onde se prova |
 |---|---|---|
-| 1. Estrutura, compilacao e Git | B | Compilacao: comando acima; `.gitignore` com seis linhas; historico de commits do repositorio. |
-| 2. Cadastro: vectors e referencia | A | `cadastrar` linha 131; recusa de repetido e `push_back` linha 144; `excluir` linha 165; `alterar` linha 193; ranking linha 462. |
-| 3. Jogo e partidas | A | Adivinhe e soma de partidas; segundo jogo com `eh_par()` que devolve `bool`, linha 306. |
-| 4. Persistencia | A | `salvar` linha 84; `carregar` linha 100; mensagem de jogadores carregados no inicio, perto da linha 516. |
-| 5. Documentacao e comparacao | A | Esta tabela tem seis linhas de comparacao; inclui as duas secoes de decisoes e o exemplo de execucao. |
+| 1. Estrutura, compilacao e Git | A | O codigo compila com o comando da secao 2; o executavel esta no `.gitignore`; ha historico de commits; excluir e alterar estao no menu (linhas 165 e 193). |
+| 2. Cadastro: vectors e referencia | B | `cadastrar` recebe os dois vectors por referencia (linha 131); cadastro usa `push_back` (linha 144); os dados sao salvos depois das acoes. |
+| 3. Jogo | A | Adivinhe incrementa as partidas do jogador correto; ha outros jogos, ranking e mensagem de abertura do ranking (funcao `ranking`, linha 462). |
+| 4. Persistencia | C | `salvar` usa `ofstream` (linha 84), `carregar` usa `ifstream` (linha 99) e a leitura acontece no inicio do programa. |
+| 5. Documentacao e comparacao | A | Este README tem as seis secoes solicitadas, a tabela C x C++ com tres comparacoes e os numeros das linhas dos dois arquivos. |
+
+Os conceitos acima sao uma autoavaliacao esperada, nao uma nota atribuida pelo professor.
