@@ -164,29 +164,32 @@ void listar(vector<string> &apelidos, vector<int> &partidas) {
 
 void excluir(vector<string> &apelidos, vector<int> &partidas) {
     if (apelidos.empty()) {
-        cout << "Nenhum jogador para excluir.\n";
+        cout << "Nenhum jogador para excluir.\\n";
         return;
     }
 
     listar(apelidos, partidas);
-    int numero = ler_numero("Numero do jogador que deseja excluir: ",
-                            1, (int)apelidos.size());
-    int pos = numero - 1;
+    string nome = ler_texto("Digite o apelido que deseja excluir: ");
+    int pos = buscar(apelidos, nome);
+
+    if (pos == -1) {
+        cout << "Jogador nao encontrado.\\n";
+        return;
+    }
 
     int confirmar = ler_numero("Confirmar exclusao? (1 sim / 0 nao): ", 0, 1);
 
     if (confirmar == 0) {
-        cout << "Exclusao cancelada.\n";
+        cout << "Exclusao cancelada.\\n";
         return;
     }
 
     apelidos.erase(apelidos.begin() + pos);
     partidas.erase(partidas.begin() + pos);
 
-    cout << "Jogador excluido com sucesso!\n";
+    cout << "Jogador excluido com sucesso!\\n";
     salvar(apelidos, partidas);
 }
-
 void alterar(vector<string> &apelidos, vector<int> &partidas) {
     if (apelidos.empty()) {
         cout << "Nenhum jogador para alterar.\n";
